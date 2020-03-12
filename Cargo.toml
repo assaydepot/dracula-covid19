@@ -1,0 +1,14 @@
+[package]
+name = "dracula-covid19"
+version = "0.1.0"
+authors = ["Xavier Lange <xrlange@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+parquet = { git = "https://github.com/tureus/arrow.git", branch = "parquet_derive_schema_master_merge_in" }
+parquet_derive = { git = "https://github.com/tureus/arrow.git", branch = "parquet_derive_schema_master_merge_in", features = ["chrono", "uuid"] }
+reqwest = { version = "0", features = ["json"] }
+csv = "1"
+tokio = { version = "0.2", features=["full"]}
