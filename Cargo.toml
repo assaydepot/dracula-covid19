@@ -11,4 +11,8 @@ parquet = { git = "https://github.com/tureus/arrow.git", branch = "parquet_deriv
 parquet_derive = { git = "https://github.com/tureus/arrow.git", branch = "parquet_derive_schema_master_merge_in", features = ["chrono", "uuid"] }
 reqwest = { version = "0", features = ["json"] }
 csv = "1"
-tokio = { version = "0.2", features=["full"]}
+tokio = { version = "0.2", features=["full"] }
+serde = { version = "1", features=["derive"] }
+chrono = "0"
+rusoto_core = "0.43.0-beta.1"
+rusoto_s3 = "0.43.0-beta.1"
