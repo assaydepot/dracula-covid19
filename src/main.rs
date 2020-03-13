@@ -20,6 +20,8 @@ const RECOVERED_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/CO
 #[derive(ParquetRecordWriter, ParquetRecordSchema)]
 struct CovidRecord {
     province_state: String,
+    state: String,
+    city: String,
     country_region: String,
     lat: String,
     long: String,
@@ -104,6 +106,17 @@ async fn convert_and_upload(
         let mut row_iter = row.iter();
 
         let province_state = row_iter.next().unwrap().to_string();
+        let state = if province_state.is_some() && province_state.find(',').is_some() {
+            province_state.split_at(province_state.len()-2).to_string()
+        } else {
+            "".to_string()
+        };
+        let city = if province_state.is_some() && province_state.find(',').is_some() {
+            &&province_state[0..province_state.find(',').unwrap_or(0)].to_string()
+        } else {
+            "".to_string()
+        };
+
         let country_region = row_iter.next().unwrap().to_string();
         let lat = row_iter.next().unwrap().to_string();
         let long = row_iter.next().unwrap().to_string();
@@ -114,6 +127,8 @@ async fn convert_and_upload(
 
             records.push(CovidRecord {
                 province_state: province_state.clone(),
+                state: state.clone(),
+                city: city.clone(),
                 country_region: country_region.clone(),
                 lat: lat.clone(),
                 long: long.clone(),
