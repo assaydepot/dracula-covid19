@@ -6,4 +6,4 @@ RUN apk add --update \
       curl && \
       rm -rf /var/cache/apk/*
 
-ADD target/cross/x86_64-unknown-linux-musl/release/dracula-covid19 /usr/bin/dracula-covid19
+ADD target/x86_64-unknown-linux-musl/release/dracula-covid19 /usr/bin/dracula-covid19
