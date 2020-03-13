@@ -26,6 +26,7 @@ linux-musl:
     - aws ecr get-login --region=eu-central-1 | awk '{gsub(/ -e none/, ""); print}' | sh
     - export TAG=covid-19-$(git rev-parse HEAD)
     - sudo /etc/init.d/docker start
+    - sleep 30000
     - docker build -t $REPO:$TAG -f Dockerfile .
     - docker push $REPO:$TAG
     - docker push $REPO:latest

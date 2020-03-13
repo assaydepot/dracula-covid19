@@ -1,0 +1,55 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: "dracula-covid19"
+  namespace: "production"
+  labels:
+    app: dracula
+    task: all
+spec:
+  schedule: "*/30 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            app: dracula
+            task: all
+          annotations:
+            iam.amazonaws.com/role: k8s-dracula
+        spec:
+          restartPolicy: Never
+          serviceAccountName: dracula
+          containers:
+            - name: dracula
+              image: "554546661178.dkr.ecr.eu-central-1.amazonaws.com/dracula:covid19"
+              imagePullPolicy: Always
+              command:
+                - bash
+                - "-c"
+                - echo START;
+                  kubectl -n production delete job waiter;
+                  kubectl -n production get pods -l app=dracula;
+                  mkdir -p target/debug && exec time dracula --table=all $POSTGRES_URL
+              #   after delete job waiter             kubectl -n production create job --from=cronjob/waiter waiter;
+              #                kubectl -n production patch job waiter -p '{"spec":{"activeDeadlineSeconds":3000}}';
+              env:
+                - name: POSTGRES_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: database-rx-production
+                      key: DATABASE_URL
+              envFrom:
+                - configMapRef:
+                    name: rx
+#                - secretRef:
+#                    name: dracula
+#          volumes:
+#            - name: aws
+#              secret:
+#                secretName: aws
+#      backoffLimit: 1

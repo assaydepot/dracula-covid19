@@ -7,6 +7,7 @@ use parquet::record::{RecordSchema, RecordWriter};
 use parquet::file::properties::WriterProperties;
 use parquet::file::writer::SerializedFileWriter;
 use rusoto_core::Region;
+use rusoto_glue::Glue;
 use rusoto_s3::{PutObjectRequest, StreamingBody, S3};
 use std::fs::File;
 use std::path::Path;
@@ -31,21 +32,26 @@ async fn main() -> Result<(), DracErr> {
     convert_and_upload(
         CONFIRMED_URL,
         "confirmed.parquet",
-        "who_covid_19_sit_rep_time_series/time_series_19-covid-Confirmed.parquet".to_string(),
+        "scientist-datawarehouse".into(),
+        "who_covid_19_sit_rep_time_series/confirmed/time_series_19-covid-Confirmed.parquet"
+            .to_string(),
     )
     .await
     .unwrap();
     convert_and_upload(
         DEATHS_URL,
         "deaths.parquet",
-        "who_covid_19_sit_rep_time_series/time_series_19-covid-Deaths.parquet".to_string(),
+        "scientist-datawarehouse".into(),
+        "who_covid_19_sit_rep_time_series/deaths/time_series_19-covid-Deaths.parquet".to_string(),
     )
     .await
     .unwrap();
     convert_and_upload(
         RECOVERED_URL,
         "recovered.parquet",
-        "who_covid_19_sit_rep_time_series/time_series_19-covid-Recovered.parquet".to_string(),
+        "scientist-datawarehouse".into(),
+        "who_covid_19_sit_rep_time_series/recovered/time_series_19-covid-Recovered.parquet"
+            .to_string(),
     )
     .await
     .unwrap();
@@ -56,6 +62,7 @@ async fn main() -> Result<(), DracErr> {
 async fn convert_and_upload(
     input_url: &str,
     parquet_name: &str,
+    bucket: String,
     key: String,
 ) -> Result<(), DracErr> {
     let path = parquet_name;
@@ -122,9 +129,20 @@ async fn convert_and_upload(
 
     parquet_writer.close().unwrap();
 
-    upload_file(path, "scientist-datawarehouse".to_string(), key)
+    upload_file(path, bucket.clone(), key.clone())
         .await
         .unwrap();
+
+    let key_parts: Vec<&str> = key.split("/").collect();
+    let glue_dir_path = (&key_parts[0..key_parts.len() - 1]).join("/");
+    let s3_path = format!("{}/{}/", bucket, glue_dir_path);
+    println!("{}", s3_path);
+
+    let crawler_name = format!("covid19-{}-crawler", parquet_name.replace(".parquet", ""));
+    create_crawler(crawler_name.clone(), s3_path).await.unwrap();
+    start_crawler(crawler_name, true).await.unwrap();
+
+    // crawl()
 
     Ok(())
 }
@@ -180,6 +198,145 @@ pub async fn upload_file<P: AsRef<Path>>(
         .await;
 
     println!("{:#?}", res);
+
+    Ok(())
+}
+
+pub async fn create_crawler(crawler_name: String, s3_path: String) -> Result<(), ()> {
+    if s3_path.split('/').last().unwrap().split('.').last() == Some(".parquet") {
+        println!("s3_path be a bucket subpath, not a parquet file");
+        return Err(());
+    }
+
+    let request = rusoto_glue::CreateCrawlerRequest {
+        classifiers: None,
+        configuration: None,
+        database_name: Some("datascience_parquet".to_string()),
+        description: None,
+        name: crawler_name.clone(),
+        role: "arn:aws:iam::554546661178:role/service-role/AWSGlueServiceRole-datascience"
+            .to_string(),
+        schedule: None,
+        schema_change_policy: None,
+        table_prefix: None,
+        targets: rusoto_glue::CrawlerTargets {
+            dynamo_db_targets: None,
+            jdbc_targets: None,
+            s3_targets: Some(vec![rusoto_glue::S3Target {
+                exclusions: None,
+                path: Some(s3_path),
+            }]),
+            catalog_targets: None,
+        },
+        tags: None,
+        crawler_security_configuration: None,
+    };
+
+    let glue = rusoto_glue::GlueClient::new(Region::default());
+
+    let result = glue
+        .get_crawler(rusoto_glue::GetCrawlerRequest { name: crawler_name })
+        .await;
+    let must_create = match result {
+        Ok(_) => false,
+        Err(rusoto_core::RusotoError::Service(rusoto_glue::GetCrawlerError::EntityNotFound(_))) => {
+            true
+        }
+        f => panic!("unhandled crawler error: {:#?}", f),
+    };
+    if must_create {
+        let result = glue.create_crawler(request).await.expect("create crawler");
+        println!("result: {:?}", result);
+    } else {
+        println!("crawler already exists")
+    }
+    Ok(())
+}
+
+pub fn delay_time() -> std::time::Duration {
+    std::time::Duration::from_secs(10)
+}
+
+pub async fn start_crawler(crawler_name: String, poll_to_completion: bool) -> Result<(), ()> {
+    let glue = rusoto_glue::GlueClient::new(Region::default());
+
+    let mut attempts = 0;
+    loop {
+        let result = glue
+            .start_crawler(rusoto_glue::StartCrawlerRequest {
+                name: crawler_name.clone(),
+            })
+            .await;
+        attempts += 1;
+
+        match result {
+            Ok(_) => {
+                println!("crawling away on {}", crawler_name);
+                break;
+            }
+            Err(crawler_error) => match crawler_error {
+                rusoto_core::RusotoError::Service(
+                    rusoto_glue::StartCrawlerError::CrawlerRunning(_),
+                ) => {
+                    if !poll_to_completion {
+                        println!("crawler failed. bailing out.");
+                        break;
+                    } else {
+                        if attempts < 20 {
+                            println!("crawler already running, retrying in 5 seconds")
+                        } else {
+                            panic!("crawler has tried 20 times. dying")
+                        }
+                        std::thread::sleep(delay_time());
+                    }
+                }
+                f => unimplemented!("don't know {:#?}", f),
+            },
+        };
+    }
+
+    if poll_to_completion {
+        wait_for_crawler(&glue, crawler_name).await?
+    }
+
+    Ok(())
+}
+
+async fn wait_for_crawler(glue: &rusoto_glue::GlueClient, crawler_name: String) -> Result<(), ()> {
+    loop {
+        let response = glue
+            .get_crawler(rusoto_glue::GetCrawlerRequest {
+                name: crawler_name.clone(),
+            })
+            .await; // .map_err(|_| ())?
+
+        match response {
+            Ok(crawler_resp) => {
+                if let Some(crawler) = crawler_resp.crawler {
+                    if crawler.state == Some("RUNNING".into()) {
+                        println!("crawler is RUNNING, going to sleep {:?}", delay_time());
+                        std::thread::sleep(delay_time());
+                        continue;
+                    } else if crawler.state == Some("STOPPING".into()) {
+                        println!(
+                            "crawler is stopping... will check for READY in {:?}",
+                            delay_time()
+                        );
+                        std::thread::sleep(delay_time());
+                        continue;
+                    } else if crawler.state == Some("READY".into()) {
+                        println!("crawler is done!");
+                        break;
+                    } else {
+                        panic!("weird state, got {:?}", crawler.state)
+                    }
+                } else {
+                    panic!("no crawler?!")
+                }
+            }
+            Err(e) => panic!("error?! {:#?}", e),
+        }
+    }
 
     Ok(())
 }
