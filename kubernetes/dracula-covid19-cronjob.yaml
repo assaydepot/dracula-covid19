@@ -26,8 +26,11 @@ spec:
           serviceAccountName: dracula
           containers:
             - name: dracula
-              image: "554546661178.dkr.ecr.eu-central-1.amazonaws.com/dracula:covid-19-asdf1234"
+              image: "554546661178.dkr.ecr.eu-central-1.amazonaws.com/dracula:covid-19-70166bf647090f9923a9a88bbede443fded90e49"
               imagePullPolicy: Always
+              env:
+                - name: AWS_REGION
+                  value: eu-central-1
               command:
                 - bash
                 - "-c"
