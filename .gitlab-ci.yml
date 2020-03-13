@@ -22,7 +22,7 @@ linux-musl:
     - RUSTFLAGS="-Ctarget-cpu=native" cargo build --release --target x86_64-unknown-linux-musl
     - du -hs target/release/*
     - cargo prune > /dev/null
-    - time tar czf $S3_CACHE_TAR_NAME cargo/ target/; aws s3 cp --no-progress $S3_CACHE_TAR_NAME $DRAC_CACHE_PATH; du -hs dracula.tar.gz
+    - time tar czf $S3_CACHE_TAR_NAME cargo/ target/; aws s3 cp --no-progress $S3_CACHE_TAR_NAME $DRAC_CACHE_PATH; du -hs $S3_CACHE_TAR_NAME
     - aws ecr get-login --region=eu-central-1 | awk '{gsub(/ -e none/, ""); print}' | sh
     - export TAG=covid-19-$(git rev-parse HEAD)
     - sudo /etc/init.d/docker start
