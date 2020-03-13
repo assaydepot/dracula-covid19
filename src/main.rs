@@ -24,12 +24,15 @@ async fn main() -> Result<(), DracErr> {
     let key =
         "csse_covid_19_time_series/combined/time_series_19-covid-Combined.parquet".to_string();
     let crawler_name = "covid19-combined".to_string();
+
+    let key_parts = key.split("/").collect::<Vec<&str>>();
+    let key_dir = key_parts[0..key_parts.len() - 1].join("/");
+    let s3_path = format!("s3://{}/{}", bucket, key_dir);
+
     upload_file("combined.parquet", bucket.clone(), key.clone())
         .await
         .unwrap();
-    create_crawler(crawler_name.clone(), format!("{}/{}", bucket, key))
-        .await
-        .unwrap();
+    create_crawler(crawler_name.clone(), s3_path).await.unwrap();
     start_crawler(crawler_name.clone(), true).await.unwrap();
 
     Ok(())
