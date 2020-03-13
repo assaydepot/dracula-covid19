@@ -11,7 +11,7 @@ pub fn extract_us_data(col1: &str) -> (Option<String>, Option<String>, Option<St
             let county_parts = col1.split(", ").collect::<Vec<&str>>();
             let county = county_parts[0].replace(" County", "");
             let state = county_parts[1];
-            let state = convert_state_abbreviation_to_full(state);
+            let state = convert_state_abbreviation_to_full(state.trim());
             (None, Some(county), Some(state.to_string()))
         } else {
             let city_parts = col1.split(", ").collect::<Vec<&str>>();
@@ -78,7 +78,7 @@ fn convert_state_abbreviation_to_full(abbrev: &str) -> &'static str {
         "WV" => "West Virginia",
         "WI" => "Wisconsin",
         "WY" => "Wyoming",
-        _ => panic!("that's not a state"),
+        unknown => panic!("`{}` not a state", unknown),
     }
 }
 

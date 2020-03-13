@@ -3,8 +3,9 @@ use parquet::record::{RecordSchema, RecordWriter};
 #[derive(ParquetRecordWriter, ParquetRecordSchema)]
 pub struct CovidRecord {
     pub province_state: String,
-    pub state: String,
-    pub city: String,
+    pub state: Option<String>,
+    pub city: Option<String>,
+    pub county: Option<String>,
     pub country_region: String,
     pub lat: String,
     pub long: String,
