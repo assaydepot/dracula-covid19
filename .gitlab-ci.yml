@@ -28,6 +28,6 @@ linux-musl:
     - sudo /etc/init.d/docker start
     - docker build -t $REPO:$TAG -f Dockerfile .
     - docker push $REPO:$TAG
-#    - kubectl -n production set image cronjob -l app=dracula-covid19 dracula=$REPO:$TAG
+    - kubectl -n production set image cronjob -l app=dracula-covid19 dracula=$REPO:$TAG
     - echo $TAG
     - curl https://hooks.slack.com/services/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 -d "{\"channel\":\"#rust\", \"text\":\"Dracula build \\\`$TAG\\\` is coughing in to his elbow\", \"username\":\"Dracula\", \"icon_emoji\":\":dracula2:\"}"
