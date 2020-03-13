@@ -33,7 +33,7 @@ async fn main() -> Result<(), DracErr> {
         CONFIRMED_URL,
         "confirmed.parquet",
         "scientist-datawarehouse".into(),
-        "who_covid_19_sit_rep_time_series/confirmed/time_series_19-covid-Confirmed.parquet"
+        "csse_covid_19_time_series/confirmed/time_series_19-covid-Confirmed.parquet"
             .to_string(),
     )
     .await
@@ -42,7 +42,7 @@ async fn main() -> Result<(), DracErr> {
         DEATHS_URL,
         "deaths.parquet",
         "scientist-datawarehouse".into(),
-        "who_covid_19_sit_rep_time_series/deaths/time_series_19-covid-Deaths.parquet".to_string(),
+        "csse_covid_19_time_series/deaths/time_series_19-covid-Deaths.parquet".to_string(),
     )
     .await
     .unwrap();
@@ -50,7 +50,7 @@ async fn main() -> Result<(), DracErr> {
         RECOVERED_URL,
         "recovered.parquet",
         "scientist-datawarehouse".into(),
-        "who_covid_19_sit_rep_time_series/recovered/time_series_19-covid-Recovered.parquet"
+        "csse_covid_19_time_series/recovered/time_series_19-covid-Recovered.parquet"
             .to_string(),
     )
     .await
