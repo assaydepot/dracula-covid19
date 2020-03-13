@@ -5,6 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4d492157-bb2a-4a0b-a9d6-effe693181b7" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitlab-ci.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dracula-covid19.iws" beforeDir="false" afterPath="$PROJECT_DIR$/dracula-covid19.iws" afterDir="false" />
@@ -44,7 +46,7 @@
     <property name="project.structure.side.proportion" value="0.0" />
     <property name="settings.editor.selected.configurable" value="language.rust.rustfmt" />
   </component>
-  <component name="RunManager" selected="Cargo Command.Run dracula-covid19">
+  <component name="RunManager">
     <configuration name="Run dracula-covid19" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="channel" value="DEFAULT" />
       <option name="command" value="run --package dracula-covid19 --bin dracula-covid19" />
@@ -53,20 +55,24 @@
       <option name="emulateTerminal" value="false" />
       <option name="backtrace" value="SHORT" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-      <envs />
+      <envs>
+        <env name="AWS_PROFILE" value="scientist" />
+      </envs>
       <method v="2">
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test main::test" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+    <configuration default="true" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="channel" value="DEFAULT" />
-      <option name="command" value="test --package dracula-covid19 --bin dracula-covid19 test" />
+      <option name="command" value="run" />
       <option name="allFeatures" value="false" />
       <option name="nocapture" value="false" />
       <option name="emulateTerminal" value="false" />
       <option name="backtrace" value="SHORT" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-      <envs />
+      <envs>
+        <env name="AWS_PROFILE" value="scientist" />
+      </envs>
       <method v="2">
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
@@ -74,7 +80,6 @@
     <recent_temporary>
       <list>
         <item itemvalue="Cargo Command.Run dracula-covid19" />
-        <item itemvalue="Cargo Command.Test main::test" />
       </list>
     </recent_temporary>
   </component>
@@ -93,7 +98,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1584052704677</updated>
-      <workItem from="1584052708530" duration="6176000" />
+      <workItem from="1584052708530" duration="7433000" />
     </task>
     <servers />
   </component>
@@ -101,26 +106,34 @@
     <option name="version" value="1" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="360" y="153" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1584071354319">
+      <screen x="0" y="23" width="1792" height="991" />
+    </state>
+    <state x="360" y="153" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1792.991@0.23.1792.991" timestamp="1584071354319" />
     <state x="709" y="214" key="#com.intellij.ide.util.MemberChooser" timestamp="1584053219371">
       <screen x="0" y="23" width="1792" height="991" />
     </state>
     <state x="709" y="214" key="#com.intellij.ide.util.MemberChooser/0.23.1792.991@0.23.1792.991" timestamp="1584053219371" />
-    <state width="1750" height="385" key="GridCell.Tab.0.bottom" timestamp="1584070454780">
+    <state x="650" y="263" key="EnvironmentVariablesDialog" timestamp="1584071345370">
       <screen x="0" y="23" width="1792" height="991" />
     </state>
-    <state width="1750" height="385" key="GridCell.Tab.0.bottom/0.23.1792.991@0.23.1792.991" timestamp="1584070454780" />
-    <state width="1750" height="385" key="GridCell.Tab.0.center" timestamp="1584070454779">
+    <state x="650" y="263" key="EnvironmentVariablesDialog/0.23.1792.991@0.23.1792.991" timestamp="1584071345370" />
+    <state width="1750" height="297" key="GridCell.Tab.0.bottom" timestamp="1584071698683">
       <screen x="0" y="23" width="1792" height="991" />
     </state>
-    <state width="1750" height="385" key="GridCell.Tab.0.center/0.23.1792.991@0.23.1792.991" timestamp="1584070454779" />
-    <state width="1750" height="385" key="GridCell.Tab.0.left" timestamp="1584070454779">
+    <state width="1750" height="297" key="GridCell.Tab.0.bottom/0.23.1792.991@0.23.1792.991" timestamp="1584071698683" />
+    <state width="1750" height="297" key="GridCell.Tab.0.center" timestamp="1584071698682">
       <screen x="0" y="23" width="1792" height="991" />
     </state>
-    <state width="1750" height="385" key="GridCell.Tab.0.left/0.23.1792.991@0.23.1792.991" timestamp="1584070454779" />
-    <state width="1750" height="385" key="GridCell.Tab.0.right" timestamp="1584070454779">
+    <state width="1750" height="297" key="GridCell.Tab.0.center/0.23.1792.991@0.23.1792.991" timestamp="1584071698682" />
+    <state width="1750" height="297" key="GridCell.Tab.0.left" timestamp="1584071698681">
       <screen x="0" y="23" width="1792" height="991" />
     </state>
-    <state width="1750" height="385" key="GridCell.Tab.0.right/0.23.1792.991@0.23.1792.991" timestamp="1584070454779" />
+    <state width="1750" height="297" key="GridCell.Tab.0.left/0.23.1792.991@0.23.1792.991" timestamp="1584071698681" />
+    <state width="1750" height="297" key="GridCell.Tab.0.right" timestamp="1584071698682">
+      <screen x="0" y="23" width="1792" height="991" />
+    </state>
+    <state width="1750" height="297" key="GridCell.Tab.0.right/0.23.1792.991@0.23.1792.991" timestamp="1584071698682" />
     <state x="384" y="73" key="SettingsEditor" timestamp="1584066833952">
       <screen x="0" y="23" width="1792" height="991" />
     </state>

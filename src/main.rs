@@ -4,11 +4,12 @@ use parquet::errors::ParquetError;
 use parquet::file::writer::FileWriter;
 use parquet::record::{RecordSchema, RecordWriter};
 
-use csv::StringRecord;
 use parquet::file::properties::WriterProperties;
 use parquet::file::writer::SerializedFileWriter;
-use serde::Deserialize;
+use rusoto_core::Region;
+use rusoto_s3::{PutObjectRequest, StreamingBody, S3};
 use std::fs::File;
+use std::path::Path;
 use std::rc::Rc;
 
 const CONFIRMED_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv";
@@ -27,13 +28,14 @@ struct CovidRecord {
 
 #[tokio::main]
 async fn main() -> Result<(), DracErr> {
+    let path = "blah.parquet";
     let req = reqwest::get(CONFIRMED_URL).await?;
     let bytes = req.bytes().await?;
     let bytes_reader = std::io::Cursor::new(&bytes[..]);
 
     let mut reader = csv::ReaderBuilder::new().from_reader(bytes_reader);
 
-    let mut parquet_writer = parquet_writer::<CovidRecord>("blah.parquet").unwrap();
+    let mut parquet_writer = parquet_writer::<CovidRecord>(path).unwrap();
 
     let dates: Vec<chrono::NaiveDateTime> = {
         let headers = reader.headers()?;
@@ -90,6 +92,14 @@ async fn main() -> Result<(), DracErr> {
 
     parquet_writer.close().unwrap();
 
+    upload_file(
+        path,
+        "scientist-datawarehouse".to_string(),
+        "who_covid_19_sit_rep_time_series/time_series_19-covid-Confirmed.parquet".to_string(),
+    )
+    .await
+    .unwrap();
+
     Ok(())
 }
 
@@ -122,11 +132,28 @@ pub fn parquet_writer<R: RecordSchema>(
     SerializedFileWriter::new(file, Rc::new(schema), props)
 }
 
-#[cfg(test)]
-mod test {
-    #[test]
-    fn test_date_parse() {
-        let test_data = "01/22/20 00:00";
-        chrono::NaiveDateTime::parse_from_str(test_data, "%m/%d/%y %H:%M").unwrap();
-    }
+pub async fn upload_file<P: AsRef<Path>>(
+    path: P,
+    bucket: String,
+    key: String,
+) -> Result<(), DracErr> {
+    let s3_client = rusoto_s3::S3Client::new(Region::default());
+
+    let data = std::fs::read(path).unwrap();
+    let data_len = data.len();
+    let stream = StreamingBody::from(data);
+
+    let res = s3_client
+        .put_object(PutObjectRequest {
+            body: Some(stream),
+            key,
+            bucket,
+            content_length: Some(data_len as i64),
+            ..Default::default()
+        })
+        .await;
+
+    println!("{:#?}", res);
+
+    Ok(())
 }

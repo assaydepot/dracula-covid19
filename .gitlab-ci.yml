@@ -1,0 +1,34 @@
+image: 554546661178.dkr.ecr.eu-central-1.amazonaws.com/rust-musl:latest
+
+stages:
+  - build
+
+variables:
+  KUBERNETES_SERVICE_ACCOUNT_OVERWRITE: gitlab-dracula
+  CARGO_HOME: $CI_PROJECT_DIR/cargo
+  S3_CACHE_BUCKET: scientist-gitlab-cache
+  S3_CACHE_PATH: gitlab_runner
+  S3_CACHE_TAR_NAME: dracula-covid19.tar.gz
+  REPO: 554546661178.dkr.ecr.eu-central-1.amazonaws.com/dracula
+
+linux-musl:
+  stage: build
+  only:
+    - master
+  script:
+    - export DRAC_CACHE_PATH=s3://$S3_CACHE_BUCKET/$S3_CACHE_PATH/$S3_CACHE_TAR_NAME
+    - echo $(aws configure list)
+    - if [[ $(aws s3 ls $DRAC_CACHE_PATH) != "" ]]; then echo "downloading cache"; aws s3 cp --no-progress $DRAC_CACHE_PATH .; echo "extracting cache"; time tar xzf $S3_CACHE_TAR_NAME; echo "done setting up cache"; else echo "boo"; fi
+    - RUSTFLAGS="-Ctarget-cpu=native" cargo build --release --target x86_64-unknown-linux-musl
+    - du -hs target/release/*
+    - cargo prune > /dev/null
+    - time tar czf $S3_CACHE_TAR_NAME cargo/ target/; aws s3 cp --no-progress $S3_CACHE_TAR_NAME $DRAC_CACHE_PATH; du -hs dracula.tar.gz
+    - aws ecr get-login --region=eu-central-1 | awk '{gsub(/ -e none/, ""); print}' | sh
+    - export TAG=covid-19-$(git rev-parse HEAD)
+    - sudo /etc/init.d/docker start
+    - docker build -t $REPO:$TAG -f Dockerfile.gitlab .
+    - docker push $REPO:$TAG
+    - docker push $REPO:latest
+    - kubectl -n production set image cronjob -l app=dracula-covid19 dracula=$REPO:$TAG
+    - echo $TAG
+    - curl https://hooks.slack.com/services/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 -d "{\"channel\":\"#rust\", \"text\":\"Dracula-COVID19 $TAG is coughing in to his elbow\", \"username\":\"Dracula\", \"icon_emoji\":\":dracula2:\"}"

@@ -381,6 +381,7 @@ dependencies = [
  "parquet_derive",
  "reqwest",
  "rusoto_core",
+ "rusoto_glue",
  "rusoto_s3",
  "serde",
  "tokio",
@@ -1569,6 +1570,20 @@ dependencies = [
  "shlex",
  "tokio",
  "zeroize",
+]
+
+[[package]]
+name = "rusoto_glue"
+version = "0.43.0-beta.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "72f60016c77d83421d053c41301dbf3eba1af79b9ea63d2d48a1b5d206e64554"
+dependencies = [
+ "async-trait",
+ "bytes",
+ "futures",
+ "rusoto_core",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
