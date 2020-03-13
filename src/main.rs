@@ -65,14 +65,19 @@ async fn extract_records(input_url: &str, records: &mut Vec<CovidRecord>) -> Res
 
         let province_state = row_iter.next().unwrap().to_string();
         let state = "dummy state".to_string();
-        let city = "dummy city".to_string();
-        // let state = if province_state.is_some() && province_state.find(',').is_some() {
+
+        // California, US
+        // Los Angeles, CA
+        // let state = if province_state.find(',').is_some() {
         //     province_state
         //         .split_at(province_state.len() - 2)
         //         .to_string()
         // } else {
         //     "".to_string()
         // };
+
+        let city = "dummy city".to_string();
+
         // let city = if province_state.is_some() && province_state.find(',').is_some() {
         //     &&province_state[0..province_state.find(',').unwrap_or(0)].to_string()
         // } else {
@@ -205,3 +210,7 @@ async fn extract_records(input_url: &str, records: &mut Vec<CovidRecord>) -> Res
 //
 //     Ok(())
 // }
+
+// California,US
+// "Los Angeles, CA",US
+// "Shasta County, CA",US
