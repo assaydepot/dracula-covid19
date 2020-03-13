@@ -8,9 +8,15 @@ const RECOVERED_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/CO
 async fn main() -> Result<(), DracErr> {
     let mut records: Vec<CovidRecord> = Vec::new();
 
-    extract_records(CONFIRMED_URL, &mut records).await.unwrap();
-    extract_records(DEATHS_URL, &mut records).await.unwrap();
-    extract_records(RECOVERED_URL, &mut records).await.unwrap();
+    extract_records(CONFIRMED_URL, "confirmed", &mut records)
+        .await
+        .unwrap();
+    extract_records(DEATHS_URL, "deaths", &mut records)
+        .await
+        .unwrap();
+    extract_records(RECOVERED_URL, "recovered", &mut records)
+        .await
+        .unwrap();
 
     write_records_to_file("combined.parquet", records);
 
@@ -29,7 +35,11 @@ async fn main() -> Result<(), DracErr> {
     Ok(())
 }
 
-async fn extract_records(input_url: &str, records: &mut Vec<CovidRecord>) -> Result<(), DracErr> {
+async fn extract_records(
+    input_url: &str,
+    status: &str,
+    records: &mut Vec<CovidRecord>,
+) -> Result<(), DracErr> {
     let req = reqwest::get(input_url).await?;
     let bytes = req.bytes().await?;
     let bytes_reader = std::io::Cursor::new(&bytes[..]);
@@ -64,10 +74,16 @@ async fn extract_records(input_url: &str, records: &mut Vec<CovidRecord>) -> Res
         let mut row_iter = row.iter();
 
         let province_state = row_iter.next().unwrap().to_string();
+        let province_state = if province_state == "" {
+            None
+        } else {
+            Some(province_state)
+        };
+
         let country_region = row_iter.next().unwrap().to_string();
 
         let (city, county, state) = if country_region == "US" {
-            extract_us_data(&province_state[..])
+            extract_us_data(&province_state.as_ref().unwrap()[..])
         } else {
             (None, None, None)
         };
@@ -80,6 +96,7 @@ async fn extract_records(input_url: &str, records: &mut Vec<CovidRecord>) -> Res
             let count: i64 = date_count_str.parse().unwrap();
 
             records.push(CovidRecord {
+                status: status.to_string(),
                 province_state: province_state.clone(),
                 state: state.clone(),
                 county: county.clone(),
