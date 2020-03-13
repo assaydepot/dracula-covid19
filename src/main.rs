@@ -13,8 +13,8 @@ use std::path::Path;
 use std::rc::Rc;
 
 const CONFIRMED_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv";
-const _DEATHS_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv";
-const _RECOVERED_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv";
+const DEATHS_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv";
+const RECOVERED_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv";
 
 #[derive(ParquetRecordWriter, ParquetRecordSchema)]
 struct CovidRecord {
@@ -28,8 +28,38 @@ struct CovidRecord {
 
 #[tokio::main]
 async fn main() -> Result<(), DracErr> {
-    let path = "blah.parquet";
-    let req = reqwest::get(CONFIRMED_URL).await?;
+    convert_and_upload(
+        CONFIRMED_URL,
+        "confirmed.parquet",
+        "who_covid_19_sit_rep_time_series/time_series_19-covid-Confirmed.parquet".to_string(),
+    )
+    .await
+    .unwrap();
+    convert_and_upload(
+        DEATHS_URL,
+        "deaths.parquet",
+        "who_covid_19_sit_rep_time_series/time_series_19-covid-Deaths.parquet".to_string(),
+    )
+    .await
+    .unwrap();
+    convert_and_upload(
+        RECOVERED_URL,
+        "recovered.parquet",
+        "who_covid_19_sit_rep_time_series/time_series_19-covid-Recovered.parquet".to_string(),
+    )
+    .await
+    .unwrap();
+
+    Ok(())
+}
+
+async fn convert_and_upload(
+    input_url: &str,
+    parquet_name: &str,
+    key: String,
+) -> Result<(), DracErr> {
+    let path = parquet_name;
+    let req = reqwest::get(input_url).await?;
     let bytes = req.bytes().await?;
     let bytes_reader = std::io::Cursor::new(&bytes[..]);
 
@@ -92,13 +122,9 @@ async fn main() -> Result<(), DracErr> {
 
     parquet_writer.close().unwrap();
 
-    upload_file(
-        path,
-        "scientist-datawarehouse".to_string(),
-        "who_covid_19_sit_rep_time_series/time_series_19-covid-Confirmed.parquet".to_string(),
-    )
-    .await
-    .unwrap();
+    upload_file(path, "scientist-datawarehouse".to_string(), key)
+        .await
+        .unwrap();
 
     Ok(())
 }
