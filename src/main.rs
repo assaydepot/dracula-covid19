@@ -98,7 +98,7 @@ async fn extract_records(
             let date_count_str = row_iter.next().unwrap();
             let count: i64 = date_count_str.parse().unwrap();
 
-            records.push(CovidRecord {
+            let mut record = CovidRecord {
                 status: status.to_string(),
                 province_state: province_state.clone(),
                 state: state.clone(),
@@ -109,9 +109,23 @@ async fn extract_records(
                 long: long.clone(),
                 date: date.clone(),
                 count,
-            })
+            };
+
+            special_case_modify(&mut record);
+
+            records.push(record)
         }
     }
 
     Ok(())
+}
+
+fn special_case_modify(record: &mut CovidRecord) {
+    if record.lat == "17.9" && record.long == "-62.8333" {
+        record.country_region = "France - Saint Barthelemy".to_string();
+    } else if record.lat == "18.0708" && record.long == "-63.0501" {
+        record.country_region = "France - St Martin".to_string();
+    } else if record.lat == "-17.6797" && record.long == "149.4068" {
+        record.country_region = "France - French Polynesia".to_string();
+    }
 }

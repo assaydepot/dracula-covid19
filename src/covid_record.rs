@@ -1,6 +1,6 @@
 use parquet::record::{RecordSchema, RecordWriter};
 
-#[derive(ParquetRecordWriter, ParquetRecordSchema)]
+#[derive(Debug, ParquetRecordWriter, ParquetRecordSchema)]
 pub struct CovidRecord {
     pub status: String,
     pub province_state: Option<String>,
