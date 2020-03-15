@@ -96,7 +96,20 @@ async fn extract_records(
 
         for date in dates.iter() {
             let date_count_str = row_iter.next().unwrap();
-            let count: i64 = date_count_str.parse().unwrap();
+
+            let count: i64 = date_count_str.parse().unwrap_or_default();
+
+            let lat = if lat == "" {
+                None
+            } else {
+                Some(lat.parse().unwrap())
+            };
+
+            let long = if long == "" {
+                None
+            } else {
+                Some(long.parse().unwrap())
+            };
 
             let mut record = CovidRecord {
                 status: status.to_string(),
@@ -105,8 +118,8 @@ async fn extract_records(
                 county: county.clone(),
                 city: city.clone(),
                 country_region: country_region.clone(),
-                lat: lat.clone(),
-                long: long.clone(),
+                lat,
+                long,
                 date: date.clone(),
                 count,
             };
@@ -121,11 +134,11 @@ async fn extract_records(
 }
 
 fn special_case_modify(record: &mut CovidRecord) {
-    if record.lat == "17.9" && record.long == "-62.8333" {
+    if record.lat == Some(17.9) && record.long == Some(-62.8333) {
         record.country_region = "France - Saint Barthelemy".to_string();
-    } else if record.lat == "18.0708" && record.long == "-63.0501" {
+    } else if record.lat == Some(18.0708) && record.long == Some(-63.0501) {
         record.country_region = "France - St Martin".to_string();
-    } else if record.lat == "-17.6797" && record.long == "149.4068" {
+    } else if record.lat == Some(-17.6797) && record.long == Some(149.4068) {
         record.country_region = "France - French Polynesia".to_string();
     }
 }
