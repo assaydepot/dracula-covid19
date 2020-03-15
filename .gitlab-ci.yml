@@ -15,7 +15,6 @@ linux-musl:
   stage: build
   only:
     - master
-    - configmap
   script:
     - kubectl create configmap dracula-covid19-web --from-file=index.html=kubernetes/index.html -n datascience -o yaml --dry-run | kubectl apply -f -
     - export DRAC_CACHE_PATH=s3://$S3_CACHE_BUCKET/$S3_CACHE_PATH/$S3_CACHE_TAR_NAME
