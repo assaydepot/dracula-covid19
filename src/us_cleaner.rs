@@ -2,6 +2,8 @@
 pub fn extract_us_data(col1: &str) -> (Option<String>, Option<String>, Option<String>) {
     if col1 == "Washington, D.C." {
         return (Some("Washington, D.C.".to_string()), None, None);
+    } else if col1 == "Virgin Islands, U.S." {
+        return (None, None, Some("Virgin Islands".to_string()));
     }
 
     if col1.contains(",") {

@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: covid19
+    component: web
+  name: dracula-covid19-web
+  namespace: datascience
+spec:
+  replicas: 2
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: covid19
+      component: web
+  template:
+    metadata:
+      labels:
+        app: covid19
+        component: web
+    spec:
+      containers:
+        - image: nginx:1.14.0-alpine
+          imagePullPolicy: Always
+          name: nginx
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /usr/share/nginx/html/index.html
+              name: dracula-covid19-web
+              subPath: index.html
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            defaultMode: 420
+            name: dracula-covid19-web
+          name: dracula-covid19-web
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: covid19
+    component: web
+  name: dracula-covid19-web
+  namespace: datascience
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+  selector:
+    app: covid19
+    component: web
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    external-dns.alpha.kubernetes.io/target: dx55vi0kzqhk.cloudfront.net
+    nginx.org/client-max-body-size: 40m
+    nginx.org/proxy-connect-timeout: 300s
+    nginx.org/proxy-pass-headers: X-Frame-Options,Cache-Control,Pragma
+    nginx.org/proxy-read-timeout: 300s
+    nginx.org/server-snippets: |
+      proxy_cookie_path / "/; HTTPOnly; Secure";
+    permit-external-dns: "true"
+  labels:
+    app: covid19
+    component: web
+  name: dracula-covid19-web
+spec:
+  rules:
+    - host: covid19.scientist.com
+      http:
+        paths:
+          - backend:
+              serviceName: dracula-covid19-web
+              servicePort: 80
+            path: /
+  tls:
+    - hosts:
+        - covid19.scientist.com
+      secretName: scientist-wildcard-cert
