@@ -28,9 +28,8 @@ spec:
               name: http
               protocol: TCP
           volumeMounts:
-            - mountPath: /usr/share/nginx/html/index.html
+            - mountPath: /usr/share/nginx/html
               name: dracula-covid19-web
-              subPath: index.html
       restartPolicy: Always
       volumes:
         - configMap:
