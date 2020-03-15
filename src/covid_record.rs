@@ -9,7 +9,7 @@ pub struct CovidRecord {
     pub county: Option<String>,
     pub country_region: String,
     pub lat: Option<f32>,
-    pub long: Option<f32>,
+    pub lon: Option<f32>,
     pub date: chrono::NaiveDateTime,
     pub count: i64,
 }
