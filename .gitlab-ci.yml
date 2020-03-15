@@ -16,7 +16,8 @@ linux-musl:
   only:
     - master
   script:
-    - export DRAC_CACHE_PATH=s3://$S3_CACHE_BUCKET/$S3_CACHE_PATH/$S3_CACHE_TAR_NAME
+    - sleep 300000
+    - kubectl create configmap dracula-covid19-web --from-file=index.html=kubernetes/index.html -n datascience -o yaml --dry-run | kubectl apply -f -    - export DRAC_CACHE_PATH=s3://$S3_CACHE_BUCKET/$S3_CACHE_PATH/$S3_CACHE_TAR_NAME
     - echo $(aws configure list)
     - if [[ $(aws s3 ls $DRAC_CACHE_PATH) != "" ]]; then echo "downloading cache"; aws s3 cp --no-progress $DRAC_CACHE_PATH .; echo "extracting cache"; time tar xzf $S3_CACHE_TAR_NAME; echo "done setting up cache"; else echo "boo"; fi
     - RUSTFLAGS="-Ctarget-cpu=native" cargo build --release --target x86_64-unknown-linux-musl
@@ -31,4 +32,3 @@ linux-musl:
     - kubectl -n production set image cronjob -l app=dracula-covid19 dracula=$REPO:$TAG
     - echo $TAG
     - curl https://hooks.slack.com/services/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 -d "{\"channel\":\"#rust\", \"text\":\"Dracula build \\\`$TAG\\\` is coughing in to his elbow\", \"username\":\"Dracula\", \"icon_emoji\":\":dracula2:\"}"
-    - kubectl create configmap dracula-covid19-web --from-file=index.html=kubernetes/index.html -n datascience -o yaml --dry-run | kubectl apply -f -
