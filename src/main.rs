@@ -1,8 +1,6 @@
 use dracula_covid19::*;
 use sentry::integrations::panic::register_panic_handler;
 
-
-
 const CONFIRMED_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv";
 const DEATHS_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv";
 const RECOVERED_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv";
@@ -137,21 +135,11 @@ async fn extract_records(
                 count,
             };
 
-            special_case_modify(&mut record);
+            remap_france(&mut record);
 
             records.push(record)
         }
     }
 
     Ok(())
-}
-
-fn special_case_modify(record: &mut CovidRecord) {
-    if record.lat == Some(17.9) && record.lon == Some(-62.8333) {
-        record.country_region = "France - Saint Barthelemy".to_string();
-    } else if record.lat == Some(18.0708) && record.lon == Some(-63.0501) {
-        record.country_region = "France - St Martin".to_string();
-    } else if record.lat == Some(-17.6797) && record.lon == Some(149.4068) {
-        record.country_region = "France - French Polynesia".to_string();
-    }
 }

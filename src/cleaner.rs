@@ -1,3 +1,19 @@
+use crate::CovidRecord;
+
+pub fn remap_france(record: &mut CovidRecord) {
+    if record.lat == Some(17.9) && record.lon == Some(-62.8333) {
+        record.country_region = "France - Saint Barthelemy".to_string();
+    } else if record.lat == Some(18.0708) && record.lon == Some(-63.0501) {
+        record.country_region = "France - St Martin".to_string();
+    } else if record.lat == Some(-17.6797) && record.lon == Some(149.4068) {
+        record.country_region = "France - French Polynesia".to_string();
+    } else if record.lat == Some(3.9339) && record.lon == Some(-53.1258) {
+        record.country_region = "France - French Guiana".to_string();
+    } else if record.lat == Some(-12.8275) && record.lon == Some(45.1662) {
+        record.country_region = "France - Mayotte".to_string();
+    }
+}
+
 // City, County, State
 pub fn extract_us_data(col1: &str) -> (Option<String>, Option<String>, Option<String>) {
     if col1 == "Washington, D.C." {
