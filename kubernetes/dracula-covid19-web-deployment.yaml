@@ -61,13 +61,16 @@ kind: Ingress
 metadata:
   annotations:
     external-dns.alpha.kubernetes.io/target: dx55vi0kzqhk.cloudfront.net
+    permit-external-dns: "true"
     nginx.org/client-max-body-size: 40m
     nginx.org/proxy-connect-timeout: 300s
     nginx.org/proxy-pass-headers: X-Frame-Options,Cache-Control,Pragma
     nginx.org/proxy-read-timeout: 300s
     nginx.org/server-snippets: |
       proxy_cookie_path / "/; HTTPOnly; Secure";
-    permit-external-dns: "true"
+    nginx.org/location-snippets: |
+      add_header Cache-Control "public";
+      expires 5m;
   labels:
     app: covid19
     component: web
