@@ -135,7 +135,7 @@ async fn extract_records(
                 count,
             };
 
-            remap_france(&mut record);
+            remap_territories(&mut record);
 
             records.push(record)
         }

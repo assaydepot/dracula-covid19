@@ -1,16 +1,33 @@
 use crate::CovidRecord;
 
-pub fn remap_france(record: &mut CovidRecord) {
-    if record.lat == Some(17.9) && record.lon == Some(-62.8333) {
-        record.country_region = "France - Saint Barthelemy".to_string();
-    } else if record.lat == Some(18.0708) && record.lon == Some(-63.0501) {
-        record.country_region = "France - St Martin".to_string();
-    } else if record.lat == Some(-17.6797) && record.lon == Some(149.4068) {
-        record.country_region = "France - French Polynesia".to_string();
-    } else if record.lat == Some(3.9339) && record.lon == Some(-53.1258) {
-        record.country_region = "France - French Guiana".to_string();
-    } else if record.lat == Some(-12.8275) && record.lon == Some(45.1662) {
-        record.country_region = "France - Mayotte".to_string();
+pub fn remap_territories(record: &mut CovidRecord) {
+    let new_country_region = match record.province_state.as_ref().map(|x| x.as_str()) {
+        Some("Saint Barthelemy") => Some("France - Saint Barthelemy"),
+        Some("St Martin") => Some("France - St Martin"),
+        Some("French Polynesia") => Some("France - French Polynesia"),
+        Some("French Guiana") => Some("France - French Guiana"),
+        Some("Mayotte") => Some("France - Mayotte"),
+        Some("Guadeloupe") => Some("France - Guadeloupe"),
+        Some("Curacao") => Some("Netherlands - Curacao"),
+        Some("Gibraltar") => Some("United Kingdom - Gibraltar"),
+        Some("Cayman Islands") => Some("United Kingdom - Cayman Islands"),
+        _ => None,
+    };
+
+    if let Some(new_country_region) = new_country_region {
+        record.country_region = new_country_region.to_string();
+    }
+
+    let rename_country_region = match record.country_region.as_str() {
+        "Antigua and Barbuda" => Some("Antigua & Barbuda"),
+        "Bosnia and Herzegovina" => Some("Bosnia & Herzegovina"),
+        "Saint Vincent and the Grenadines" => Some("Saint Vincent & the Grenadines"),
+        "Trinidad and Tobago" => Some("Trinidad & Tobago"),
+        _ => None,
+    };
+
+    if let Some(country_region) = new_country_region {
+        record.country_region = country_region.to_string();
     }
 }
 
