@@ -60,15 +60,19 @@
         <div class="col-12">
           <h3>About this COVID-19 tracker</h3>
           <p>
-              <a href="https://scientist.com/">Scientist.com</a>'s data team is contributing insight to the severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) viral outbreak currently impacting communities worldwide. Our goal is to provide up to the hour data, but in practice our source data streams can lag and we may be up to a day behind.
+            <a href="https://scientist.com/">Scientist.com</a>'s data team is contributing insight to the severe acute respiratory syndrome coronavirus 2 (SARS-CoV-2) viral outbreak currently impacting communities worldwide. Our goal is to provide up to the hour data, but in practice our source data streams can lag and we may be up to a day behind.
           </p>
 
           <p>
-              The data is taken from the Johns Hopkins University Center for Systems Science and Engineering open data repository. Find the repo here <a href="https://github.com/CSSEGISandData/COVID-19/">https://github.com/CSSEGISandData/COVID-19/</a>. Look in the <pre style="display: inline">csse_covid_19_data/csse_covid_19_time_series</pre> folder for the raw data.
+            The data is taken from the Johns Hopkins University Center for Systems Science and Engineering open data repository. Find the repo here <a href="https://github.com/CSSEGISandData/COVID-19/">https://github.com/CSSEGISandData/COVID-19/</a>. Look in the <pre style="display: inline">csse_covid_19_data/csse_covid_19_time_series</pre> folder for the raw data.
           </p>
 
           <p>
-              The data is lightly processed, normalizing US states and French territories. You can find that data processing tool here: <a href="https://github.com/assaydepot/dracula-covid19">https://github.com/assaydepot/dracula-covid19</a>.
+            The data is lightly processed, normalizing US states and French territories. You can find that data processing tool here: <a href="https://github.com/assaydepot/dracula-covid19">https://github.com/assaydepot/dracula-covid19</a>.
+          </p>
+
+          <p>
+            As the situation evolves we are making upgrades to this tracker. If you want to be notified of changes, please subscribe below.
           </p>
         </div>
       </div>
@@ -79,13 +83,13 @@
       var vizElement = divElement.getElementsByTagName('object')[0];
       if (divElement.offsetWidth > 800) {
           vizElement.style.width = '1400px';
-          vizElement.style.height = '1027px';
+          vizElement.style.height = '1100px';
       } else if (divElement.offsetWidth > 500) {
           vizElement.style.width = '1400px';
-          vizElement.style.height = '1027px';
+          vizElement.style.height = '1100px';
       } else {
           vizElement.style.width = '100%';
-          vizElement.style.height = '1327px';
+          vizElement.style.height = '1100px';
       }
       var scriptElement = document.createElement('script');
       scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
