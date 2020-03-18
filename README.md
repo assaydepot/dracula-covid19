@@ -33,3 +33,34 @@ What libraries does it use?
  * Tokio for async
  * The great native Rust Parquet library: parquet-rs
  * CSV
+ 
+Exploring Parquet
+---
+
+The Apache Arrow parquet-rs library includes some handy command line tools for looking at parquet files. To install them:
+
+```
+$ cargo install parquet
+# make sure you've got ~/.cargo/bin in your $PATH
+$ parquet-schema combined.parquet 
+# accurate as of March 18
+Metadata for file: combined.parquet
+
+version: 1
+num of rows: 77280
+created by: parquet-rs version 1.0.0-SNAPSHOT (build fcde39b7c8f5498bae0decb04b5ce65feff758fd)
+message schema {
+  REQUIRED BYTE_ARRAY status (UTF8);
+  OPTIONAL BYTE_ARRAY province_state (UTF8);
+  OPTIONAL BYTE_ARRAY state (UTF8);
+  OPTIONAL BYTE_ARRAY city (UTF8);
+  OPTIONAL BYTE_ARRAY county (UTF8);
+  REQUIRED BYTE_ARRAY country_region (UTF8);
+  OPTIONAL FLOAT lat;
+  OPTIONAL FLOAT lon;
+  REQUIRED INT64 date (TIMESTAMP_MILLIS);
+  REQUIRED INT64 count;
+}
+$ parquet-read combined.parquet
+# all the rows get printed out as JSON
+```
