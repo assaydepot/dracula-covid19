@@ -26,7 +26,7 @@ pub fn remap_territories(record: &mut CovidRecord) {
         _ => None,
     };
 
-    if let Some(country_region) = new_country_region {
+    if let Some(country_region) = rename_country_region {
         record.country_region = country_region.to_string();
     }
 }
