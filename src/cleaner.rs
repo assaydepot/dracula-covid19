@@ -1,7 +1,7 @@
 use crate::CovidRecord;
 
 pub fn remap_territories(record: &mut CovidRecord) {
-    let new_country_region = match record.province_state.as_ref().map(|x| x.as_str()) {
+    let new_country_region = match record.province_state.as_deref() {
         Some("Saint Barthelemy") => Some("France - Saint Barthelemy"),
         Some("St Martin") => Some("France - St Martin"),
         Some("French Polynesia") => Some("France - French Polynesia"),
@@ -39,7 +39,7 @@ pub fn extract_us_data(col1: &str) -> (Option<String>, Option<String>, Option<St
         return (None, None, Some("Virgin Islands".to_string()));
     }
 
-    if col1.contains(",") {
+    if col1.contains(',') {
         // county or city
         if col1.contains("County") {
             // county

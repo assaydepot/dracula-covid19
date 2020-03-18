@@ -36,7 +36,7 @@ async fn main() -> Result<(), DracErr> {
         "csse_covid_19_time_series/combined/time_series_19-covid-Combined.parquet".to_string();
     let crawler_name = "covid19-combined".to_string();
 
-    let key_parts = key.split("/").collect::<Vec<&str>>();
+    let key_parts = key.split('/').collect::<Vec<&str>>();
     let key_dir = key_parts[0..key_parts.len() - 1].join("/");
     let s3_path = format!("s3://{}/{}", bucket, key_dir);
 
@@ -74,10 +74,10 @@ async fn extract_records(
                     &format!("{} 00:00", date_str),
                     "%-m/%-d/%y %H:%M",
                 );
-                if res.is_err() {
-                    panic!("could not parse `{}`", date_str);
+                if let Ok(res) = res {
+                    res
                 } else {
-                    res.unwrap()
+                    panic!("could not parse `{}`", date_str)
                 }
             })
             .collect()
@@ -105,7 +105,7 @@ async fn extract_records(
         let lat = row_iter.next().unwrap().to_string();
         let long = row_iter.next().unwrap().to_string();
 
-        for date in dates.iter() {
+        for date in dates.iter().cloned() {
             let date_count_str = row_iter.next().unwrap();
 
             let count: i64 = date_count_str.parse().unwrap_or_default();
@@ -131,7 +131,7 @@ async fn extract_records(
                 country_region: country_region.clone(),
                 lat,
                 lon,
-                date: date.clone(),
+                date,
                 count,
             };
 
