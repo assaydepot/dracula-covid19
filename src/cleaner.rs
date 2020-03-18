@@ -11,6 +11,7 @@ pub fn remap_territories(record: &mut CovidRecord) {
         Some("Curacao") => Some("Netherlands - Curacao"),
         Some("Gibraltar") => Some("United Kingdom - Gibraltar"),
         Some("Cayman Islands") => Some("United Kingdom - Cayman Islands"),
+        Some("Reunion") => Some("France - Reunion"),
         _ => None,
     };
 
