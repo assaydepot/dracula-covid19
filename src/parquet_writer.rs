@@ -9,6 +9,7 @@ use std::fs::File;
 use std::rc::Rc;
 
 use crate::CovidRecord;
+use crate::Population;
 
 pub fn write_records_to_file(path: &str, records: Vec<CovidRecord>) {
     let mut parquet_writer = parquet_writer::<CovidRecord>(path).unwrap();
@@ -29,4 +30,14 @@ pub fn parquet_writer<R: RecordSchema>(
     let file = File::create(path).unwrap();
 
     SerializedFileWriter::new(file, Rc::new(schema), props)
+}
+
+pub fn write_records_to_file_population(path: &str, records: Vec<Population>) {
+    let mut parquet_writer = parquet_writer::<Population>(path).unwrap();
+
+    let mut row_group = parquet_writer.next_row_group().unwrap();
+    (&records[..]).write_to_row_group(&mut row_group).unwrap();
+    parquet_writer.close_row_group(row_group).unwrap();
+
+    parquet_writer.close().unwrap();
 }
