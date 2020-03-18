@@ -70,7 +70,7 @@ metadata:
       proxy_cookie_path / "/; HTTPOnly; Secure";
     nginx.org/location-snippets: |
       add_header Cache-Control "public";
-      expires 5m;
+      expires 5s;
   labels:
     app: covid19
     component: web
