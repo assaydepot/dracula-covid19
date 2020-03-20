@@ -1,9 +1,16 @@
 use dracula_covid19::*;
 use sentry::integrations::panic::register_panic_handler;
+use structopt::StructOpt;
 
 const CONFIRMED_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv";
 const DEATHS_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv";
 const RECOVERED_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv";
+
+#[derive(StructOpt)]
+struct Opt {
+    #[structopt(short, long, parse(try_from_str), default_value = "true")]
+    upload: bool
+}
 
 #[tokio::main]
 async fn main() -> Result<(), DracErr> {
@@ -19,6 +26,8 @@ async fn main() -> Result<(), DracErr> {
 
     register_panic_handler();
 
+    let opt = Opt::from_args();
+
     extract_records(CONFIRMED_URL, "confirmed", &mut records)
         .await
         .unwrap();
@@ -30,6 +39,10 @@ async fn main() -> Result<(), DracErr> {
         .unwrap();
 
     write_records_to_file("combined.parquet", records);
+
+    if !opt.upload {
+        return Ok(())
+    }
 
     let bucket = "scientist-datawarehouse".to_string();
     let key =

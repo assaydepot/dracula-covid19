@@ -18,6 +18,7 @@ rusoto_core = "0.43.0"
 rusoto_s3 = "0.43.0"
 rusoto_glue = "0.43.0"
 rusoto_quicksight = "0.43.0"
+structopt = { version = "0.3", default-features = false }
 url = "1.7"
 slack-hook = "0.7"
 sentry = "0.12.0"
