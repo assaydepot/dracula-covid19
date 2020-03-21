@@ -23,7 +23,11 @@ cd dracula-covid19
 cargo run 
 ``` 
 
-the tool is not optimized for local use but we're open to PRs to make it easier (probably just a matter of skipping the AWS cloud API calls). Right now we're focused on the data but we're open to PRs!
+You may need to be on the rust `nightly` channel since some dependencies may use the `#![feature]` gate.
+
+The tool is not optimized for local use but accepts the standard `-h, --help` and `-V, --version` flags. In addition it takes a `-u, --upload` flag that defaults to `true` that enables uploading the `combined.parquet` file to AWS. For local use, just run the tool with `--upload false` to disable the upload.
+
+Right now we're focused on the data but we're open to PRs!
 
 What libraries does it use?
 ---
