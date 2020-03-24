@@ -17,6 +17,8 @@ pub fn remap_territories(record: &mut CovidRecord) {
         Some("Bermuda") => Some("United Kingdom - Bermuda"),
         Some("Sint Maarten") => Some("Netherlands - Sint Maarten"),
         Some("New Caledonia") => Some("France - New Caledonia"),
+        Some("Faroe Islands") => Some("Denmark - Faroe Islands"),
+        Some("Greenland") => Some("Denmark - Greenland"),
         _ => None,
     };
 
