@@ -7,9 +7,12 @@ use crate::aws::*;
 use crate::cleaner::*;
 use crate::parquet_writer::write_records_to_file;
 
-const CONFIRMED_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv";
-const DEATHS_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv";
-const RECOVERED_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv";
+//const CONFIRMED_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv";
+const CONFIRMED_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv";
+//const DEATHS_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv";
+const DEATHS_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv";
+//const RECOVERED_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv";
+const RECOVERED_URL: &str = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv";
 
 #[tokio::main]
 pub async fn covid19_data() -> Result<(), DracErr> {
@@ -68,11 +71,11 @@ async fn extract_records(
                 // panic!("{}", date_str);
                 let res = chrono::NaiveDateTime::parse_from_str(
                     &format!("{} 00:00", date_str),
-                    "%-m/%-d/%y %H:%M",
+                    "%-m/%-d/%Y %H:%M",
                 );
                 if let Ok(res) = res {
                     res
-                } else {
+                } else  {
                     panic!("could not parse `{}`", date_str)
                 }
             })
@@ -93,7 +96,7 @@ async fn extract_records(
         let country_region = row_iter.next().unwrap().to_string();
 
         let (city, county, state) = if country_region == "US" {
-            extract_us_data(&province_state.as_ref().unwrap()[..])
+            extract_us_data(&province_state.as_ref().unwrap_or(&"".to_string())[..])
         } else {
             (None, None, None)
         };
