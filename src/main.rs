@@ -113,7 +113,7 @@ async fn extract_records(
         let country_region = row_iter.next().unwrap().to_string();
 
         let (city, county, state) = if country_region == "US" {
-            extract_us_data(&province_state.as_ref().unwrap()[..])
+            extract_us_data(&province_state.as_ref().unwrap_or(&"".to_string())[..])
         } else {
             (None, None, None)
         };
